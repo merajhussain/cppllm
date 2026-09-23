@@ -1,6 +1,6 @@
-# llmwrapper (C++)
+# cppllm (C++)
 
-A C++17 library that gives your application one interface to **OpenAI, Anthropic Claude, Google Gemini and Mistral**. It's a port of the Java/Spring Boot `llmwrapper` service: the REST server is gone and you link the library straight into your app.
+A C++17(support upto C++23) lightweight library that gives your application one interface to **OpenAI, Anthropic Claude, Google Gemini and Mistral**. It's a port of the Java/Spring Boot `llmwrapper` service: the REST server is gone and you link the library straight into your app.
 
 - **Cross-platform: Windows, Linux and macOS.** On Windows, HTTPS goes through WinHTTP, which ships with Windows, so there are no dependencies. It uses the system proxy settings and certificate store. On Linux and macOS it uses libcurl. JSON parsing uses the bundled single header `nlohmann/json`, and nothing JSON-related shows up in the public headers.
 - **Static `.lib` or `.dll`**, with a CMake package so other projects can use `find_package(llmwrapper)`.
