@@ -1,10 +1,20 @@
-# cppllm (C++)
+# llmwrapper (C++)
 
-A C++17(support upto C++23) lightweight library that gives your application one interface to **OpenAI, Anthropic Claude, Google Gemini and Mistral**. It's a port of the Java/Spring Boot `llmwrapper` service: the REST server is gone and you link the library straight into your app.
+A C++17 library that gives your application one interface to **OpenAI, Anthropic Claude, Google Gemini and Mistral**. It's a port of the Java/Spring Boot `llmwrapper` service: the REST server is gone and you link the library straight into your app.
 
-- **Cross-platform: Windows, Linux and macOS.** On Windows, HTTPS goes through WinHTTP, which ships with Windows, so there are no dependencies. It uses the system proxy settings and certificate store. On Linux and macOS it uses libcurl. JSON parsing uses the bundled single header `nlohmann/json`, and nothing JSON-related shows up in the public headers.
+- **Cross-platform: Windows, Linux and macOS.** See [Dependencies](#dependencies) for what each platform uses.
 - **Static `.lib` or `.dll`**, with a CMake package so other projects can use `find_package(llmwrapper)`.
 - **Builds with Visual Studio 2026**: open `llmwrapper.sln` and build. CMake (Open Folder or a generated `.slnx`) also works.
+
+## Dependencies
+
+| Dependency | Used for | Windows | Linux / macOS | How you get it |
+|---|---|---|---|---|
+| [nlohmann/json](https://github.com/nlohmann/json) 3.12 (MIT) | Building requests and parsing responses | ✔ | ✔ | Bundled in `third_party/nlohmann/json.hpp`, so there's nothing to install. Set `-DLLMWRAPPER_USE_SYSTEM_JSON=ON` to use your own copy (e.g. from vcpkg). |
+| WinHTTP | HTTPS requests | ✔ | — | Part of Windows. `winhttp.lib` is linked automatically. |
+| libcurl | HTTPS requests | optional (`-DLLMWRAPPER_USE_CURL=ON`) | ✔ | Linux: `libcurl4-openssl-dev` / `libcurl-devel`. macOS: ships with the OS. |
+
+The JSON library is used on **every** platform, Windows included. It's compiled into the library, and none of the public headers in `include/` include it, so applications that use llmwrapper don't need `nlohmann/json` on their include path.
 
 ## What's new compared with the Java version
 
@@ -28,7 +38,7 @@ Install the **"Desktop development with C++"** workload.
 ### Option A: Open the solution (easiest)
 1. Double-click **`llmwrapper.sln`**, or use File → Open → Project/Solution.
 2. Choose **Debug** or **Release** and **x64** on the toolbar, then **Build → Build Solution** (Ctrl+Shift+B).
-3. Press **F5** to run the unit tests. `llmwrapper_tests` is the startup project and needs no API keys.
+3. Press **F5** to run the tests. `llmwrapper_tests` is the startup project and makes real API calls; see [Tests](#tests).
 4. To call a real model, right-click **llmwrapper_cli** → *Set as Startup Project*. Under *Properties → Debugging → Command Arguments*, enter something like `--env C:\llmwrapper\.env --provider anthropic "Hello"`.
 
 Output goes to `out\msvc\x64\<Config>\`:
@@ -50,7 +60,7 @@ The projects use Visual Studio's default toolset (`v145` in VS 2026) and the new
 ### Option B: CMake, Open Folder
 1. In VS 2026, go to **File → Open → Folder…** and pick the `cpp` folder.
 2. Choose a preset from the toolbar: `x64 Debug (static lib)`, `x64 Release (static lib)`, `x64 Debug (DLL)` or `x64 Release (DLL)`.
-3. Run **Build → Build All**. Use **Test → Run CTest** to run the unit tests.
+3. Run **Build → Build All**. Use **Test → Run CTest** to run the tests.
 4. To try it out, pick `llmwrapper_cli.exe` as the startup item.
 
 ### Option C: CMake, generate a `.slnx` solution
@@ -197,9 +207,34 @@ cpp/
 │   └── http/               winhttp_client.cpp (Windows), curl_client.cpp (Linux/macOS)
 ├── third_party/nlohmann/   bundled JSON header (MIT)
 ├── examples/cli/           command-line demo
-├── tests/                  offline unit tests (mock HTTP, no keys needed)
+├── tests/                  integration tests (real API calls, keys from .env)
 └── cmake/                  find_package support
 ```
+
+## Tests
+
+The tests call the **real APIs** and don't use mocks. For every provider that has a key, they check:
+
+- plain text generation, system prompts and multi-turn history
+- `maxTokens` truncation and per-call model overrides
+- sentiment analysis
+- UTF-8 text in both directions
+- concurrent calls with `chatAsync`
+- the returned metadata: model, stop reason and token usage
+- a bad key producing a proper `ApiError`
+
+They also make one network call to a host that doesn't exist, to check that it produces a `TransportError`.
+
+**Configuring keys.** The tests use the same variables as everything else (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `MISTRAL_API_KEY`, plus the optional `*_MODEL`). They look for them in this order:
+
+1. `--env C:\path\to\.env` on the command line
+2. the `LLMWRAPPER_ENV_FILE` environment variable, set to the path of a `.env` file
+3. the first `.env` file found in the working directory or any of the 6 folders above it. From `C:\llmwrapper\cpp` that finds `C:\llmwrapper\.env` automatically.
+4. process environment variables
+
+**Skipping providers.** A provider with no key is **skipped**, not failed. If no keys are configured at all, CTest reports the test as *Skipped*. To test a single provider, run `llmwrapper_tests --provider gemini`.
+
+**Cost.** Each run sends about 12 short prompts per configured provider, a few hundred tokens in total.
 
 ## Extending
 - **New provider:** add a class in `src/providers/` that derives from `detail::ProviderServiceBase`, then add a `Provider` enum value and a case in `createService()`.
