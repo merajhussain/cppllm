@@ -1,0 +1,14 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Threads)
+if(@LLMWRAPPER_USE_SYSTEM_JSON@ AND NOT @BUILD_SHARED_LIBS@)
+    find_dependency(nlohmann_json 3.11)
+endif()
+
+if(@LLMWRAPPER_USE_CURL@ AND NOT @BUILD_SHARED_LIBS@)
+    find_dependency(CURL)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/llmwrapperTargets.cmake")
+check_required_components(llmwrapper)

@@ -1,0 +1,193 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "x64-debug",
+      "displayName": "x64 Debug (static lib)",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "x64-release",
+      "displayName": "x64 Release (static lib)",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "x64-debug-dll",
+      "displayName": "x64 Debug (DLL)",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "x64-release-dll",
+      "displayName": "x64 Release (DLL)",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    },
+    {
+      "name": "vs2026",
+      "displayName": "Visual Studio 2026 solution (.slnx)",
+      "description": "Generates a Visual Studio 2026 solution. Needs CMake 4.2+ (the one bundled with VS 2026 is fine).",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/out/vs2026",
+      "installDir": "${sourceDir}/out/install/vs2026",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "unix-base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "unix-debug",
+      "displayName": "Linux/macOS Debug",
+      "inherits": "unix-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "unix-release",
+      "displayName": "Linux/macOS Release",
+      "inherits": "unix-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "unix-release-shared",
+      "displayName": "Linux/macOS Release (shared .so/.dylib)",
+      "inherits": "unix-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_SHARED_LIBS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-debug",
+      "configurePreset": "x64-debug"
+    },
+    {
+      "name": "x64-release",
+      "configurePreset": "x64-release"
+    },
+    {
+      "name": "x64-debug-dll",
+      "configurePreset": "x64-debug-dll"
+    },
+    {
+      "name": "x64-release-dll",
+      "configurePreset": "x64-release-dll"
+    },
+    {
+      "name": "vs2026-debug",
+      "configurePreset": "vs2026",
+      "configuration": "Debug"
+    },
+    {
+      "name": "vs2026-release",
+      "configurePreset": "vs2026",
+      "configuration": "Release"
+    },
+    {
+      "name": "unix-debug",
+      "configurePreset": "unix-debug"
+    },
+    {
+      "name": "unix-release",
+      "configurePreset": "unix-release"
+    },
+    {
+      "name": "unix-release-shared",
+      "configurePreset": "unix-release-shared"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "x64-debug",
+      "configurePreset": "x64-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "x64-release",
+      "configurePreset": "x64-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "vs2026-debug",
+      "configurePreset": "vs2026",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "unix-debug",
+      "configurePreset": "unix-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "unix-release",
+      "configurePreset": "unix-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

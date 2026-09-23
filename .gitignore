@@ -1,0 +1,7 @@
+out/
+build/
+.vs/
+CMakeUserPresets.json
+*.env
+.env
+!.env.example

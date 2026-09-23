@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{A1C3E7F0-3B5D-4E2A-9C61-7D0B2F4A8E11}</ProjectGuid>
+    <RootNamespace>llmwrapper</RootNamespace>
+    <ProjectName>llmwrapper</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <!-- Uses whatever toolset the installed Visual Studio defaults to (v145 in VS 2026). -->
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='Debug'">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)'=='Release'">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="llmwrapper.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <TargetName Condition="'$(Configuration)'=='Debug'">llmwrapperd</TargetName>
+    <TargetName Condition="'$(Configuration)'=='Release'">llmwrapper</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\src;..\third_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\llmwrapper\config.hpp" />
+    <ClInclude Include="..\include\llmwrapper\errors.hpp" />
+    <ClInclude Include="..\include\llmwrapper\export.hpp" />
+    <ClInclude Include="..\include\llmwrapper\http_client.hpp" />
+    <ClInclude Include="..\include\llmwrapper\llm_client.hpp" />
+    <ClInclude Include="..\include\llmwrapper\llm_service.hpp" />
+    <ClInclude Include="..\include\llmwrapper\llmwrapper.hpp" />
+    <ClInclude Include="..\include\llmwrapper\types.hpp" />
+    <ClInclude Include="..\include\llmwrapper\version.hpp" />
+    <ClInclude Include="..\src\internal\provider_base.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\config.cpp" />
+    <ClCompile Include="..\src\llm_client.cpp" />
+    <ClCompile Include="..\src\llm_service.cpp" />
+    <ClCompile Include="..\src\provider_base.cpp" />
+    <ClCompile Include="..\src\types.cpp" />
+    <ClCompile Include="..\src\http\winhttp_client.cpp" />
+    <ClCompile Include="..\src\providers\anthropic_service.cpp" />
+    <ClCompile Include="..\src\providers\gemini_service.cpp" />
+    <ClCompile Include="..\src\providers\openai_compatible_service.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
